@@ -7,10 +7,11 @@ const { redirect } = require('express/lib/response');
 const User = require('./models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
+const { pickBy, identity } = require('lodash')
 
 
 const { signup_post } = require('./controllers/authController');
+const { use } = require('./routes/authRoutes');
 const app = express();
 
 // middleware
@@ -45,6 +46,24 @@ app.get('/getusers',requireAuth,isAdmin,async (req,res)=>{
   res.send(users)
   console.log(users);
 })
+
+app.post("/modifieradmin",requireAuth,isAdmin, (req ,res) => {
+  const dataUser = pickBy({
+    name: req.body.name,
+    email: req.body.email,
+    role: req.body.role,
+    deleted: req.body.deleted,
+},identity)
+  const user = User.updateOne({email: dataUser.updateOne},dataUser)
+  res.send(user)
+
+})
+
+app.get('/getbyid',requireAuth,isAdmin, (req ,res) => {
+  const user = User.find({_id:req.body._id})
+  res.send(user)
+})
+
 app.get('/getCurrentUser',requireAuth,(req,res)=>{
   const token = req.cookies.jwt;
   if (token) {
