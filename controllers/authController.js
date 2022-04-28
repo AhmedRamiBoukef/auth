@@ -8,17 +8,17 @@ const handleErrors = (err) => {
 
   // incorrect email
   if (err.message === 'incorrect email') {
-    errors.email = 'That email is not registered';
+    errors = 'That email is not registered';
   }
 
   // incorrect password
   if (err.message === 'incorrect password') {
-    errors.password = 'That password is incorrect';
+    errors = 'That password is incorrect';
   }
 
   // duplicate email error
   if (err.code === 11000) {
-    errors.email = 'that email is already registered';
+    errors = 'that email is already registered';
     return errors;
   }
 
@@ -28,7 +28,7 @@ const handleErrors = (err) => {
     Object.values(err.errors).forEach(({ properties }) => {
       // console.log(val);
       // console.log(properties);
-      errors[properties.path] = properties.message;
+      errors = properties.message;
     });
   }
 
@@ -94,13 +94,14 @@ const generatePassword = (
     const user = await User.create({ name, email, password,role,deleted});
     
     const token = createToken(user._id,user.role);
+    console.log(password);
     sendMail(
       email ,
       "Bienvenue dans EsiSwitch",
       "Bonjour, \nMaintenant vous pouvez acceder a notre espace ESiSwitch :\nemail: "+email+"\nmot de passe: "+password
     )
   //  res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
-    res.status(201).json({ user: user._id });
+    res.status(201).json();
   }
   catch(err) {
     const errors = handleErrors(err);
@@ -129,7 +130,8 @@ module.exports.login_post = async (req, res) => {
     }
     else
     {
-      res.status(400).send( "ce compte est desactive" );
+      const errors = "ce compte est desactive"
+      res.status(400).send( errors );
     }
    
   }
